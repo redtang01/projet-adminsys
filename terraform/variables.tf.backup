@@ -1,0 +1,26 @@
+# tflint-ignore: terraform_unused_declarations
+
+
+variable "region_front" {
+  type    = string
+  default = "GRA11"
+}
+variable "region" {
+  type    = list
+  default = ["GRA11", "SBG5"]
+}
+variable "instance_name" {
+  type = string
+  default = "eductive06"
+}
+
+variable "image_name" {
+  type = string
+  default = "Debian 11"
+}
+
+variable "flavor_name" {
+  type = string
+  default = "s1-2"
+}
+

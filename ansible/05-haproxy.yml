@@ -1,0 +1,20 @@
+---
+- name: Install and configure a kitten web page
+  hosts: front
+  
+  vars:
+    helloworld: Coucou
+
+  tasks:
+    - name: Ensure package haproxy is installed
+      apt:
+        name: haproxy
+        state: latest
+    - name: Ensure service haproxy is running
+      service:
+        name: haproxy
+        state: started
+    - name: Configure haproxy.cfg
+      template:
+        src: templates/haproxy.j2
+        dest: /etc/haproxy/haproxy.cfg

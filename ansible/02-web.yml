@@ -1,0 +1,20 @@
+---
+- name: Install and configure a kitten web page
+  hosts: test
+  
+  vars:
+    helloworld: Coucou
+
+  tasks:
+    - name: Ensure package nginx is installed
+      apt:
+        name: nginx
+        state: latest
+    - name: Ensure service nginx is running
+      service:
+        name: nginx
+        state: started
+    - name: Configure Kitten Page
+      template:
+        src: templates/index.j2
+        dest: /var/www/html/index.html

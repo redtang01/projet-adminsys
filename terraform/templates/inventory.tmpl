@@ -1,0 +1,21 @@
+---
+frontend:
+  hosts:
+    ${front}:
+      ansible_user: debian
+      ansible_become: True
+backend_1:
+  hosts:
+%{ for node in tp_backend_1 ~}
+    ${node}:
+      ansible_user: debian
+      ansible_become: True
+%{ endfor ~}
+backend_2:
+  hosts:
+%{ for node in tp_backend_2 ~}
+    ${node}:
+      ansible_user: debian
+      ansible_become: True
+%{ endfor ~}
+
