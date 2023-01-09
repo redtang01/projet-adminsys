@@ -39,6 +39,13 @@ resource "openstack_compute_instance_v2" "tp_frontend" {
   network {
     name      = "Ext-Net"
   }
+
+  network {
+    name = ovh_cloud_project_network_private.network.name
+  }
+  depends_on = [ovh_cloud_project_network_private_subnet.subnet]
+
+
 }
 
 

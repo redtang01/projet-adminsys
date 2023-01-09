@@ -2,7 +2,7 @@
 - name: Install and configure a kitten web page on backends
   hosts: backend_1
   vars:
-    helloworld: Coucou
+    cat_bestuser: "Mon user eductive06 : le meilleur !"
   tasks:
     - name: Mise a jour apt
       apt:
@@ -24,25 +24,108 @@
       ansible.builtin.service:
         name: nginx
         state: restarted
+
+- name: "Partie pour récupérer les facts du groupe2 depuis localhost"
+  hosts: frontend
+  any_errors_fatal: yes
+ 
+  tasks:
+  - setup:
+    delegate_to: "{{item}}"
+    delegate_facts: True
+    with_items: "{{groups.backend_2}}"
+
+
 - name: Install and haproxy on front
   hosts: frontend
   tasks:
+
     - name: Ensure package haproxy is installed
       apt:
         name: haproxy
         state: latest
-    - name: Ensure service haproxy is running
-      service:
-        name: haproxy
-        state: started
+
     - name: Configure haproxy
       template:
         src: templates/haproxy.j2
         dest: /etc/haproxy/haproxy.cfg
-      notify:
+      notify: 
         - Reload haproxy
+
+    - name: Ensure service haproxy is running
+      service:
+        name: haproxy
+        state: restarted
+
   handlers:
     - name: Reload haproxy
       ansible.builtin.service:
         name: haproxy
         state: reloaded
+
+- name: Install and configure docker on backends 2
+  hosts: backend_2
+  tasks:
+    - name: Mise a jour apt
+      apt:
+        update_cache: yes
+
+    - name: Install apt-transport-https
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - lsb-release
+          - gnupg
+        state: latest
+        update_cache: true
+
+    - name: Add an Apt signing key
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Add specified repository into sources list
+      apt_repository:
+        repo: deb https://download.docker.com/linux/debian bullseye stable
+        state: present    
+        filename: docker
+
+    - name: Install apt git
+      apt:
+        name: git
+        state: present
+
+    - name: Just ensuring the repo checkout exists
+      git:
+        repo: 'https://github.com/georgyo/ifconfig.io/'
+        dest: /home/debian/ifconfig.io/
+        update: no
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        name:
+          - docker
+          - docker.io
+          - docker-compose
+          - docker-registry
+        state: latest
+        update_cache: true
+    
+    - name: Ensure service docker is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Run container
+      become: True
+      shell:
+        cmd: "docker-compose up -d "
+        chdir: /home/debian/ifconfig.io/
+ 
+  handlers:
+    - name: Restart docker
+      service:
+        name: docker
+        state: restarted

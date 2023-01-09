@@ -1,9 +1,3 @@
-backend backends1
-    mode http
-    balance roundrobin
-    {% for backend in groups['backend_1'] -%}
-      server backend{{ loop.index }} {{backend}}:80 check
-    {% endfor -%}
 global
     log /dev/log    local0
     log /dev/log    local1 notice
@@ -29,6 +23,11 @@ frontend frontend1
     bind *:80
     default_backend backends1
 
+frontend frontend2
+    bind *:81
+    default_backend backends2
+
+
 listen stats
     bind *:8080
     stats enable
@@ -39,5 +38,16 @@ backend backends1
     mode http
     balance roundrobin
     {% for backend in groups['backend_1'] -%}
-      server backend{{ loop.index }} {{backend}}:80 check
+
+      server backend1_{{ loop.index }} {{backend}}:80 check {% if 'sbg' in hostvars[backend]['ansible_facts']['hostname'] %}backup {% endif %}
+
+    {% endfor -%}
+
+backend backends2
+    mode http
+    balance roundrobin
+    {% for backend in groups['backend_2'] -%}
+
+      server backend2_{{ loop.index }} {{ hostvars[backend]['ansible_facts']['ens4']['ipv4']['address'] }}:8080 check {% if 'sbg' in hostvars[backend]['ansible_facts']['hostname'] %}backup {% endif %}
+
     {% endfor -%}

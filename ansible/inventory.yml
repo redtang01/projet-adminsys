@@ -1,23 +1,23 @@
 ---
 frontend:
   hosts:
-    57.128.19.34:
+    57.128.81.148:
       ansible_user: debian
       ansible_become: True
 backend_1:
   hosts:
-    162.19.71.60:
+    162.19.70.219:
       ansible_user: debian
       ansible_become: True
-    146.59.243.225:
+    51.91.147.171:
       ansible_user: debian
       ansible_become: True
 backend_2:
   hosts:
-    162.19.68.195:
+    57.128.87.138:
       ansible_user: debian
       ansible_become: True
-    146.59.241.33:
+    146.59.241.147:
       ansible_user: debian
       ansible_become: True
 
