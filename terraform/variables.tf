@@ -4,6 +4,12 @@ variable "region_front" {
   default = "GRA11"
 }
 
+variable "region_db" {
+  type    = string
+  default = "GRA"
+}
+
+
 variable "region_back" {
   type    = list
   default = ["GRA11", "SBG5"]
@@ -18,6 +24,16 @@ variable "instance_name_back" {
   default = "backend_eductive06"
 }
 
+variable "instance_name_db" {
+  type = string
+  default = "db_eductive06"
+}
+
+variable "user_name" {
+  type = string
+  default = "eductive06"
+}
+
 variable "number_instance_back" {
   type    = number
   default = 3
@@ -29,6 +45,11 @@ variable "image_name" {
 }
 
 variable "flavor_name" {
+  type = string
+  default = "s1-2"
+}
+
+variable "flavor_name_bdd" {
   type = string
   default = "s1-2"
 }

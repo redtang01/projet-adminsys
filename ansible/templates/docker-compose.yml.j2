@@ -1,0 +1,14 @@
+version: '3.3'
+
+services :
+  wordpress:
+    image: wordpress:latest
+    ports:
+      - "80:80"
+    environment:
+      WORDPRESS_DB_HOST: groups['db']['db_wordpress']['domain']:groups['db']['port'] 
+      WORDPRESS_DB_USER: groups['db']['db_wordpress']['name']
+      WORDPRESS_DB_PASSWORD: groups['db']['db_wordpress']['password']
+      WORDPRESS_DB_NAME: db_eductive06
+volumes:
+  db_data: 

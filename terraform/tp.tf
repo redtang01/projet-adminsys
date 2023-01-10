@@ -16,15 +16,6 @@ resource "openstack_compute_keypair_v2" "back_key" {
   region     = element(var.region_back, count.index)
 }
 
-#resource "local_file" "inventory" {
-#  filename = "../ansible/inventory.yml"
-#  content = templatefile("inventory.tmpl",
-#    {
-#      nodes_front = [for k, p in openstack_compute_instance_v2.tp_frontend: p.access_ip_v4],
-#      nodes_back = [for k, p in openstack_compute_instance_v2.tp_backend: p.access_ip_v4],
-#    }
-#  )
-#}
 
 # Création d'une instance
 resource "openstack_compute_instance_v2" "tp_frontend" {
@@ -71,6 +62,64 @@ resource "openstack_compute_instance_v2" "tp_backend" {
 
 }
 
+#création d'une instance DB Mysql
+resource "ovh_cloud_project_database" "db_eductive06" {
+  service_name  = var.service_name
+  description   = var.instance_name_db
+  engine        = "mysql"
+  version       = "8"
+  plan          = "essential"
+  nodes {
+    region  = var.region_db
+  }
+  flavor        = "db1-4"
+  disk_size     = 80
+}
+
+#Création du user DB
+resource "ovh_cloud_project_database_user" "user" {
+  service_name  = ovh_cloud_project_database.db_eductive06.service_name
+  engine        = ovh_cloud_project_database.db_eductive06.engine
+  cluster_id    = ovh_cloud_project_database.db_eductive06.id
+  name          = var.user_name
+  password_reset= "admin"
+}
+
+#Création database 
+resource "ovh_cloud_project_database_database" "database" {
+  service_name  = ovh_cloud_project_database.db_eductive06.service_name
+  engine        = ovh_cloud_project_database.db_eductive06.engine
+  cluster_id    = ovh_cloud_project_database.db_eductive06.id
+  name          = var.instance_name_db
+}
+
+#Création ip restrict 1
+resource "ovh_cloud_project_database_ip_restriction" "iprestriction1" {
+  service_name  = ovh_cloud_project_database.db_eductive06.service_name
+  engine        = ovh_cloud_project_database.db_eductive06.engine
+  cluster_id    = ovh_cloud_project_database.db_eductive06.id
+  ip            = "${openstack_compute_instance_v2.tp_backend[4].access_ip_v4}/32"
+}
+
+#Création ip restrict 2
+resource "ovh_cloud_project_database_ip_restriction" "iprestriction2" {
+  service_name  = ovh_cloud_project_database.db_eductive06.service_name
+  engine        = ovh_cloud_project_database.db_eductive06.engine
+  cluster_id    = ovh_cloud_project_database.db_eductive06.id
+  ip            = "${openstack_compute_instance_v2.tp_backend[5].access_ip_v4}/32"
+}
+
+
+output "user_name" {
+  value = ovh_cloud_project_database_user.user.name
+}
+
+output "user_password" {
+  value     = ovh_cloud_project_database_user.user.password
+  sensitive = true
+}
+
+
 # Inventaire
 resource "local_file" "inventory" {
   filename = "../ansible/inventory.yml"
@@ -80,6 +129,10 @@ resource "local_file" "inventory" {
       tp_backend_2 = [for k, p in openstack_compute_instance_v2.tp_backend: p.access_ip_v4 if substr(p.name, -1,length(p.name)) == "2"],
       tp_backend_3 = [for k, p in openstack_compute_instance_v2.tp_backend: p.access_ip_v4 if substr(p.name, -1,length(p.name)) == "3"],
       front = openstack_compute_instance_v2.tp_frontend.access_ip_v4,
+      user_name = ovh_cloud_project_database_user.user.name
+      password = ovh_cloud_project_database_user.user.password
+      domain = ovh_cloud_project_database.db_eductive06.endpoints[0].domain
+      port = ovh_cloud_project_database.db_eductive06.endpoints[0].port
     }
   )
 }

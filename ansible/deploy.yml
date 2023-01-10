@@ -1,5 +1,5 @@
 ---
+- import_playbook: deploy_front.yml
 #- import_playbook: deploy_backends1.yml
 #- import_playbook: deploy_backends2.yml
 - import_playbook: deploy_backends3.yml
-- import_playbook: deploy_front.yml

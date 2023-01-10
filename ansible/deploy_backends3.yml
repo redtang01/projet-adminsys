@@ -31,3 +31,61 @@
         path: "{{ loc }}"
         fstype: nfs
         state: mounted
+
+
+- name: Install and configure docker on backends 3
+  hosts: backend_3
+  tasks:
+    - name: Mise a jour apt
+      apt:
+        update_cache: yes
+
+    - name: Install apt-transport-https
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - lsb-release
+          - gnupg
+        state: latest
+        update_cache: true
+
+    - name: Add an Apt signing key
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        name:
+          - docker
+          - docker.io
+          - docker-compose
+          - docker-registry
+        state: latest
+        update_cache: true
+    
+    - name: Ensure service docker is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create docker/wordpress directory
+      file:
+        path: /opt/docker/wordpress
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+    - name: Create docker-compose file
+      template:
+        src: docker-compose.yml.j2
+        dest: /opt/docker/wordpress/docker-compose.yml
+        owner: root
+        group: root
+        mode: 0644
+    - name: Run docker-compose up -d
+      shell: docker-compose up -d
+      args:
+        chdir: /opt/docker/wordpress/

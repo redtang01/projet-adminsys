@@ -1,31 +1,39 @@
 ---
 frontend:
   hosts:
-    57.128.81.148:
+    141.95.151.30:
       ansible_user: debian
       ansible_become: True
 backend_1:
   hosts:
-    162.19.70.219:
+    141.95.151.130:
       ansible_user: debian
       ansible_become: True
-    51.91.147.171:
+    57.128.70.72:
       ansible_user: debian
       ansible_become: True
 backend_2:
   hosts:
-    57.128.87.138:
+    57.128.86.63:
       ansible_user: debian
       ansible_become: True
-    146.59.241.147:
+    57.128.68.225:
       ansible_user: debian
       ansible_become: True
 backend_3:
   hosts:
-    141.95.151.240:
+    57.128.83.48:
       ansible_user: debian
       ansible_become: True
-    57.128.34.73:
+    57.128.69.58:
       ansible_user: debian
       ansible_become: True
+db:
+  hosts: 
+    db_wordpress:
+      domain: mysql-120614aa-o5d5bb6d4.database.cloud.ovh.net
+      port: 20184
+      name: eductive06
+      password: AVNS_bX7-gXWACY9MqtuWd2f
 
+ 
