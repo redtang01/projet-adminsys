@@ -1,0 +1,3 @@
+{% for host in groups['frontend'] %}
+{{ hostvars[host]['ansible_facts']['ens4']['ipv4']['address'] }}:{{loc}}
+{% endfor %}

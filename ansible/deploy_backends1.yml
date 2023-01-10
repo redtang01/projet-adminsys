@@ -1,0 +1,26 @@
+---
+- name: Install and configure a kitten web page on backends
+  hosts: backend_1
+  vars:
+    cat_bestuser: "Mon user eductive06 : le meilleur !"
+  tasks:
+    - name: Mise a jour apt
+      apt:
+        update_cache: yes
+    - name: Ensure package nginx is installed
+      apt:
+        name: nginx
+        state: latest
+    - name: Ensure service nginx is running
+      service:
+        name: nginx
+        state: started
+    - name: Configure Kitten Page
+      template:
+        src: templates/index.j2
+        dest: /var/www/html/index.html
+  handlers:
+    - name: Restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted

@@ -78,6 +78,7 @@ resource "local_file" "inventory" {
     {
       tp_backend_1 = [for k, p in openstack_compute_instance_v2.tp_backend: p.access_ip_v4 if substr(p.name, -1,length(p.name)) == "1"],
       tp_backend_2 = [for k, p in openstack_compute_instance_v2.tp_backend: p.access_ip_v4 if substr(p.name, -1,length(p.name)) == "2"],
+      tp_backend_3 = [for k, p in openstack_compute_instance_v2.tp_backend: p.access_ip_v4 if substr(p.name, -1,length(p.name)) == "3"],
       front = openstack_compute_instance_v2.tp_frontend.access_ip_v4,
     }
   )

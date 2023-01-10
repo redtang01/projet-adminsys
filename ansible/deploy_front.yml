@@ -1,0 +1,75 @@
+---
+- name: "Partie pour récupérer les facts du groupe 1 et 2 depuis localhost"
+  hosts: frontend
+  any_errors_fatal: yes
+ 
+  tasks:
+  - setup:
+    delegate_to: "{{item}}"
+    delegate_facts: True
+    with_items: "{{groups.backend_1}}"
+  - setup:
+    delegate_to: "{{item}}"
+    delegate_facts: True
+    with_items: "{{groups.backend_2}}"
+
+
+- name: Install and haproxy on front
+  hosts: frontend
+  tasks:
+
+    - name: Ensure package haproxy is installed
+      apt:
+        name: haproxy
+        state: latest
+
+    - name: Configure haproxy
+      template:
+        src: templates/haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+      notify: 
+        - Reload haproxy
+
+    - name: Ensure service haproxy is running
+      service:
+        name: haproxy
+        state: restarted
+
+  handlers:
+    - name: Reload haproxy
+      ansible.builtin.service:
+        name: haproxy
+        state: reloaded
+
+
+- name: Install nfs server
+  hosts: frontend
+  tasks: 
+    
+    - name: Create repository if doesn't exist
+      file:
+        path: /home/wordpress-data
+        state: directory
+        mode: 777 
+
+    - name: Install apt nfs server
+      apt:
+        name: 
+          - nfs-kernel-server
+          - nfs-common
+        state: latest
+    
+    - name: check service nfs is running
+      service:
+        name: nfs-kernel-server
+        state: started
+
+    - name: Add a line if doesn't exist
+      lineinfile:
+        dest: /etc/exports
+        line: '/home/wordpress-data/ 192.168.6.0/255.255.255.0(rw,no_root_squash,anonuid=1000,anongid=1000,sync)'
+        create: yes
+        state: present
+     
+    - name: NFS export 
+      shell: exportfs -a

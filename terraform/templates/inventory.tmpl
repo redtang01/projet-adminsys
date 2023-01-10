@@ -18,4 +18,11 @@ backend_2:
       ansible_user: debian
       ansible_become: True
 %{ endfor ~}
+backend_3:
+  hosts:
+%{ for node in tp_backend_3 ~}
+    ${node}:
+      ansible_user: debian
+      ansible_become: True
+%{ endfor ~}
 

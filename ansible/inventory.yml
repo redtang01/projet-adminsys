@@ -20,4 +20,12 @@ backend_2:
     146.59.241.147:
       ansible_user: debian
       ansible_become: True
+backend_3:
+  hosts:
+    141.95.151.240:
+      ansible_user: debian
+      ansible_become: True
+    57.128.34.73:
+      ansible_user: debian
+      ansible_become: True
 

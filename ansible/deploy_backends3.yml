@@ -1,0 +1,33 @@
+---
+- name: Install and configure a kitten web page on backends
+  hosts: backend_3
+  vars:
+    loc: /home/wordpress-data
+    remote_file: /home/debian/loc_nfs
+  tasks:
+    - setup:
+      delegate_to: "{{item}}"
+      delegate_facts: True
+      with_items: "{{groups.frontend}}"
+    - template:
+        src: templates/loc_nfs.j2
+        dest: /home/debian/loc_nfs
+    - shell: cat "{{remote_file}}"
+      register: data
+    - name: Install apt nfs
+      apt:
+        name:
+          - nfs-common
+        state: latest
+        update_cache: yes
+    - name: Create repository if doesn't exist
+      file:
+        path: "{{ loc }}"
+        state: directory
+        mode: 777
+    - name: Mount nfs
+      mount:
+        src: "{{ data.stdout }}"
+        path: "{{ loc }}"
+        fstype: nfs
+        state: mounted

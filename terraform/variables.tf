@@ -20,7 +20,7 @@ variable "instance_name_back" {
 
 variable "number_instance_back" {
   type    = number
-  default = 2
+  default = 3
 }
 
 variable "image_name" {
