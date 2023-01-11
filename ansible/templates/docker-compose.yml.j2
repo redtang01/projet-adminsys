@@ -6,9 +6,11 @@ services :
     ports:
       - "80:80"
     environment:
-      WORDPRESS_DB_HOST: groups['db']['db_wordpress']['domain']:groups['db']['port'] 
-      WORDPRESS_DB_USER: groups['db']['db_wordpress']['name']
-      WORDPRESS_DB_PASSWORD: groups['db']['db_wordpress']['password']
+{% for host in groups['db'] %}
+      WORDPRESS_DB_HOST: {{host}}:{{hostvars[host]['port']}} 
+      WORDPRESS_DB_USER: {{hostvars[host]['name']}}
+      WORDPRESS_DB_PASSWORD: {{hostvars[host]['password']}}
       WORDPRESS_DB_NAME: db_eductive06
+{% endfor %}
 volumes:
   db_data: 

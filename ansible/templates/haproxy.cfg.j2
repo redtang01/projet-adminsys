@@ -27,6 +27,9 @@ frontend frontend2
     bind *:81
     default_backend backends2
 
+frontend frontend3
+    bind *:83
+    default_backend backends3
 
 listen stats
     bind *:8080
@@ -49,5 +52,15 @@ backend backends2
     {% for backend in groups['backend_2'] -%}
 
       server backend2_{{ loop.index }} {{ hostvars[backend]['ansible_facts']['ens4']['ipv4']['address'] }}:8080 check {% if 'sbg' in hostvars[backend]['ansible_facts']['hostname'] %}backup {% endif %}
+
+    {% endfor -%}
+
+backend backends3
+    mode http
+    balance roundrobin
+    {% for backend in groups['backend_3'] -%}
+
+      server backend3_{{ loop.index }} {{ hostvars[backend]['ansible_facts']['ens4']['ipv4']['address'] }}:80 check {% if 'sbg' in hostvars[backend]['ansible_facts']['hostname'] %}backup {% endif %}
+
 
     {% endfor -%}

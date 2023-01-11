@@ -26,9 +26,8 @@ backend_3:
       ansible_become: True
 %{ endfor ~}
 db:
-  hosts: 
-    db_wordpress:
-      domain: ${domain}
+  hosts:
+    ${domain}:
       port: ${port}
       name: ${user_name}
       password: ${password}
