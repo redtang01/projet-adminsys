@@ -1,38 +1,38 @@
 ---
 frontend:
   hosts:
-    57.128.81.217:
+    57.128.44.17:
       ansible_user: debian
       ansible_become: True
 backend_1:
   hosts:
-    57.128.87.206:
+    57.128.85.67:
       ansible_user: debian
       ansible_become: True
-    51.68.84.226:
+    57.128.71.58:
       ansible_user: debian
       ansible_become: True
 backend_2:
   hosts:
-    57.128.83.48:
+    57.128.81.107:
       ansible_user: debian
       ansible_become: True
-    135.125.13.140:
+    57.128.71.13:
       ansible_user: debian
       ansible_become: True
 backend_3:
   hosts:
-    57.128.87.116:
+    57.128.82.228:
       ansible_user: debian
       ansible_become: True
-    135.125.14.125:
+    57.128.69.58:
       ansible_user: debian
       ansible_become: True
 db:
   hosts:
-    mysql-ebc428eb-o5d5bb6d4.database.cloud.ovh.net:
+    mysql-e8f51fde-o5d5bb6d4.database.cloud.ovh.net:
       port: 20184
       name: eductive06
-      password: AVNS_XxYdtluIGXAn2wW_xE1
+      password: AVNS_QOWfwGWUnXPM5xN0PoK
 
  

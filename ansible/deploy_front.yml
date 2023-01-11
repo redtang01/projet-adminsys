@@ -1,5 +1,7 @@
 ---
-- name: "Partie pour récupérer les facts du groupe 1 et 2 depuis localhost"
+#fichier ansible pour la création du front
+#récupération des facts des backends pour utiliser en particulier les ips privés ou autres
+- name: "Partie pour récupérer les facts de tout les backends"
   hosts: frontend
   any_errors_fatal: yes
  
@@ -17,23 +19,25 @@
     delegate_facts: True
     with_items: "{{groups.backend_3}}"
 
-- name: Install and haproxy on front
+
+#installation du haproxy 
+- name: Installation du haproxy
   hosts: frontend
   tasks:
 
-    - name: Ensure package haproxy is installed
+    - name: Vérifié et installer le dépot haproxy si besoin 
       apt:
         name: haproxy
         state: latest
 
-    - name: Configure haproxy
+    - name: Configure avec le template le haproxy
       template:
         src: templates/haproxy.cfg.j2
         dest: /etc/haproxy/haproxy.cfg
       notify: 
         - Reload haproxy
 
-    - name: Ensure service haproxy is running
+    - name: Vérifier et démarrer le haproxy si besoin
       service:
         name: haproxy
         state: restarted
@@ -45,34 +49,35 @@
         state: reloaded
 
 
-- name: Install nfs server
+#installation du nfs server
+- name: Installation du nfs server
   hosts: frontend
   tasks: 
     
-    - name: Create repository if doesn't exist
+    - name: Créer le dossier si il n'existe pas
       file:
         path: /home/wordpress-data
         state: directory
         mode: 777 
 
-    - name: Install apt nfs server
+    - name: Vérifié et installer le dépot nfs serveur si besoin
       apt:
         name: 
           - nfs-kernel-server
           - nfs-common
         state: latest
     
-    - name: check service nfs is running
+    - name: Vérifier et démarrer le service nfs serveur si besoin
       service:
         name: nfs-kernel-server
         state: started
 
-    - name: Add a line if doesn't exist
+    - name: Ajouter la line de configuration dans le fichier d'export nfs
       lineinfile:
         dest: /etc/exports
         line: '/home/wordpress-data/ 192.168.6.0/255.255.255.0(rw,no_root_squash,anonuid=1000,anongid=1000,sync)'
         create: yes
         state: present
      
-    - name: NFS export 
+    - name: Exporter le nfs
       shell: exportfs -a

@@ -1,3 +1,4 @@
+#fichier pour récupérer la variable de l'ip privé du front pour le nfs et le chemin du fichier wordpress-data
 {% for host in groups['frontend'] %}
 {{ hostvars[host]['ansible_facts']['ens4']['ipv4']['address'] }}:{{loc}}
 {% endfor %}

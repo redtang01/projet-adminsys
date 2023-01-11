@@ -19,33 +19,41 @@ defaults
     timeout client 10000
     timeout server 10000
 
+#ajouter les backends 1 sur le port 80
 frontend frontend1
     bind *:80
     default_backend backends1
 
+#ajouter les backends 2 sur le port 81
 frontend frontend2
     bind *:81
     default_backend backends2
 
+#ajouter les backends 3 sur le port 82
 frontend frontend3
-    bind *:83
+    bind *:82
     default_backend backends3
 
+#ajout des stats haproxy sur le port 8080
 listen stats
     bind *:8080
     stats enable
-    stats uri /stats
+    stats refresh 30s
+    stats uri /
     stats realm Haproxy\ Statistics
 
+#création des deux backends 1 avec le check et le backup pour la région SBG 
 backend backends1
     mode http
     balance roundrobin
+    option forwardfor
     {% for backend in groups['backend_1'] -%}
 
       server backend1_{{ loop.index }} {{backend}}:80 check {% if 'sbg' in hostvars[backend]['ansible_facts']['hostname'] %}backup {% endif %}
 
     {% endfor -%}
 
+#création des deux backends 2 avec le check et le backup pour la région SBG
 backend backends2
     mode http
     balance roundrobin
@@ -55,6 +63,7 @@ backend backends2
 
     {% endfor -%}
 
+#création des deux backends 3 avec le check et le backup pour la région SBG
 backend backends3
     mode http
     balance roundrobin
