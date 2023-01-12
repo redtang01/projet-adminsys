@@ -1,5 +1,5 @@
 ---
-- name: Install and configure a kitten web page on backends
+- name: Install NFS client on backend3
   hosts: backend_3
   vars:
     loc: /home/wordpress-data
