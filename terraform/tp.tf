@@ -1,4 +1,4 @@
-# Création d'une ressource de paire de clés SSH
+# Création d'une ressource de paire de clés SSH pour le front
 resource "openstack_compute_keypair_v2" "front_key" {
   provider   = openstack.ovh
   name       = "sshkey_${var.instance_name_front}"
@@ -7,7 +7,7 @@ resource "openstack_compute_keypair_v2" "front_key" {
 }
 
 
-# Création d'une ressource de paire de clés SSH
+# Création d'une ressource de paire de clés SSH pour le back
 resource "openstack_compute_keypair_v2" "back_key" {
   count      = length(var.region_back)
   provider   = openstack.ovh
@@ -17,7 +17,7 @@ resource "openstack_compute_keypair_v2" "back_key" {
 }
 
 
-# Création d'une instance
+# Création d'une instance front
 resource "openstack_compute_instance_v2" "tp_frontend" {
   name        = var.instance_name_front   # Nom de l'instance
   provider    = openstack.ovh        # Nom du fournisseur
@@ -40,7 +40,7 @@ resource "openstack_compute_instance_v2" "tp_frontend" {
 }
 
 
-# Création d'une instance
+# Création de toutes les instances back 
 resource "openstack_compute_instance_v2" "tp_backend" {
   count       = var.number_instance_back * 2   # Nombre d'instance
   name        = "${var.instance_name_back}_${lower(substr(element(var.region_back, count.index), 0, 3))}_${((count.index + 1) % 2 == 0) ? ((count.index+1) / 2) : (((count.index +1) + 1) / 2)}"   # Nom de l'instance
@@ -110,17 +110,19 @@ resource "ovh_cloud_project_database_ip_restriction" "iprestriction2" {
 }
 
 
+#afficher et exporte le user de la bdd
 output "user_name" {
   value = ovh_cloud_project_database_user.user.name
 }
 
+#afficher et exporte le password de la bdd
 output "user_password" {
   value     = ovh_cloud_project_database_user.user.password
   sensitive = true
 }
 
 
-# Inventaire
+# Creation de l'inventaire avec l'ip de toutes mes instances et les variables pour ma BDD
 resource "local_file" "inventory" {
   filename = "../ansible/inventory.yml"
   content  = templatefile("templates/inventory.tmpl",
@@ -140,7 +142,7 @@ resource "local_file" "inventory" {
 # Création d'un réseau privé
  resource "ovh_cloud_project_network_private" "network" {
     service_name = var.service_name
-    name         = "private_network_${var.instance_name_back}"                        # Nom du réseau
+    name         = "private_network_${var.instance_name_back}"                     
     regions      = var.region_back
     provider     = ovh.ovh                                  # Nom du fournisseur
     vlan_id      = var.vlan_id                              # Identifiant du vlan pour le vRrack
