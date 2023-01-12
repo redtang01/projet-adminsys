@@ -23,7 +23,7 @@ Cette page internet affichera un wordpress sur lequel vous pourrez créer votre 
 
  - vous pouvez y accéder grâce à l'ip du front suivi de  :82  ce qui donnera `<ip front>:82`
 
-
+Il y aura aussi une page accessible sur le port 8080 avec les statistiques de notre haproxy
 
 Installation
 
